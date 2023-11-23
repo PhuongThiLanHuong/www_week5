@@ -4,6 +4,8 @@ package vn.edu.iuh.fit.www_week05.fontend.Controllers;
 import com.neovisionaries.i18n.CountryCode;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
@@ -11,8 +13,10 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.ModelAndView;
 import vn.edu.iuh.fit.www_week05.backend.models.Address;
 import vn.edu.iuh.fit.www_week05.backend.models.Candidate;
+import vn.edu.iuh.fit.www_week05.backend.models.Skill;
 import vn.edu.iuh.fit.www_week05.backend.repositories.AddressRepository;
 import vn.edu.iuh.fit.www_week05.backend.repositories.CandidateRepository;
+import vn.edu.iuh.fit.www_week05.backend.repositories.SkillRepository;
 import vn.edu.iuh.fit.www_week05.backend.services.CandidateServices;
 
 import java.util.List;
@@ -28,6 +32,8 @@ public class CandidateController {
     private CandidateServices candidateServices;
     @Autowired
     private AddressRepository addressRepository;
+    @Autowired
+    private SkillRepository skillRepository;
 
     @GetMapping("/list")
     public String showCandidateList(Model model) {
@@ -70,6 +76,7 @@ public class CandidateController {
         modelAndView.setViewName("candidates/add");
         return modelAndView;
     }
+
     @PostMapping("/candidates/add")
     public String addCandidate(
             @ModelAttribute("candidate") Candidate candidate,
@@ -85,7 +92,7 @@ public class CandidateController {
     public ModelAndView edit(@PathVariable("id") long id) {
         ModelAndView modelAndView = new ModelAndView();
         Optional<Candidate> opt = candidateRepository.findById(id);
-        if(opt.isPresent()) {
+        if (opt.isPresent()) {
             Candidate candidate = opt.get();
             modelAndView.addObject("candidate", candidate);
             modelAndView.addObject("address", candidate.getAddress());
@@ -94,6 +101,7 @@ public class CandidateController {
         }
         return modelAndView;
     }
+
     @PostMapping("/candidates/update/{id}")
     public String update(
             @ModelAttribute("candidate") Candidate candidate,
@@ -105,11 +113,30 @@ public class CandidateController {
     }
 
     @GetMapping("/candidates/delete/{id}")
-    public String delete(@PathVariable("id") long id){
+    public String delete(@PathVariable("id") long id) {
         Optional<Candidate> optionalCandidate = candidateRepository.findById(id);
-        if(optionalCandidate.isPresent()){
+        if (optionalCandidate.isPresent()) {
             candidateRepository.delete(optionalCandidate.get());
         }
         return "redirect:/list";
+    }
+
+    @GetMapping("/suggest-skill")
+    public String home(@RequestParam("page") Optional<Integer> page, @RequestParam("size") Optional<Integer> size, @RequestParam("candidate-id") Optional<Long> candidateId, Model model) {
+        int sizeI = size.orElse(10);
+        List<Candidate> candidates = candidateRepository.findAll();
+
+        if (candidateId.isPresent()) {
+            PageRequest pageRequest = PageRequest.of(page.orElse(1) - 1, sizeI, Sort.by("id"));
+
+            Page<Skill> skills = skillRepository.suggestForCandidate(candidateId.get(), pageRequest);
+
+            model.addAttribute("skills", skills);
+            model.addAttribute("candidateId", candidateId.get());
+            model.addAttribute("pages", IntStream.rangeClosed(1, skills.getTotalPages()).boxed().collect(Collectors.toList()));
+        }
+        model.addAttribute("candidates", candidates);
+
+        return "candidates/suggest-skill";
     }
 }
