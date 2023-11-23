@@ -1,9 +1,9 @@
 package vn.edu.iuh.fit.www_week05.backend.models;
 
 
+import com.neovisionaries.i18n.CountryCode;
 import jakarta.persistence.*;
 import lombok.*;
-import vn.edu.iuh.fit.www_week05.backend.enums.Country;
 
 @Entity
 @Table(name = "address")
@@ -25,27 +25,20 @@ public class Address {
     @Column(name = "zipcode", length = 7)
     private String zipcode;
     @Column(name = "country", length = 30)
-    private Country country;
+    private CountryCode country;
 
 
-
-    public Address(String number, String street, String city, String zipcode,Country country) {
+    public Address(String number, String street, String city, String zipcode, CountryCode country) {
         this.number = number;
         this.street = street;
         this.city = city;
         this.zipcode = zipcode;
-        this.country=country;
+        this.country = country;
     }
+
 
     @Override
     public String toString() {
-        return "Address{" +
-                "id=" + id +
-                ", number='" + number + '\'' +
-                ", street='" + street + '\'' +
-                ", city='" + city + '\'' +
-                ", zipcode='" + zipcode + '\'' +
-                ", country=" + country +
-                '}';
+        return number + ", " + street + ", " + city + ", " + zipcode + ", " + country.getName();
     }
 }
