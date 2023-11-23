@@ -35,7 +35,7 @@ public class CandidateController {
         return "candidates/list_no_paging";
     }
 
-    @GetMapping("/candidates")
+    @GetMapping("/list-paging")
     public String showCandidateListPaging(Model model,
                                           @RequestParam("page") Optional<Integer> page,
                                           @RequestParam("size") Optional<Integer> size) {
@@ -78,7 +78,7 @@ public class CandidateController {
         addressRepository.save(address);
         candidate.setAddress(address);
         candidateRepository.save(candidate);
-        return "redirect:/candidates";
+        return "redirect:/list";
     }
 
     @GetMapping("/show-edit-form/{id}")
@@ -94,14 +94,22 @@ public class CandidateController {
         }
         return modelAndView;
     }
-    @PostMapping("/candidates/update")
+    @PostMapping("/candidates/update/{id}")
     public String update(
             @ModelAttribute("candidate") Candidate candidate,
-            @ModelAttribute("address") Address address,
-            BindingResult result, Model model) {
+            @ModelAttribute("address") Address address) {
         addressRepository.save(address);
 //        candidate.setAddress(address);
         candidateRepository.save(candidate);
-        return "redirect:/candidates";
+        return "redirect:/candidates/update";
+    }
+
+    @GetMapping("/candidates/delete/{id}")
+    public String delete(@PathVariable("id") long id){
+        Optional<Candidate> optionalCandidate = candidateRepository.findById(id);
+        if(optionalCandidate.isPresent()){
+            candidateRepository.delete(optionalCandidate.get());
+        }
+        return "redirect:/list";
     }
 }
