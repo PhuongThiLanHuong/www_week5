@@ -21,7 +21,7 @@
             <select name="candidate-id" id="candidate-id" class="form-select" aria-label="Default select example">
                 <option th:each="candidate : ${candidates}" th:value="${candidate.getId()}" th:text="${candidate.getFullName()}" th:selected="${candidate.getId() == candidateId} ? selected" />
             </select>
-            <button type="submit" class="btn btn-primary text-nowrap">Get skills</button>
+            <button type="submit" class="btn btn-danger text-nowrap">Get skills</button>
         </form>
 
         <div th:if="${skills != null}">

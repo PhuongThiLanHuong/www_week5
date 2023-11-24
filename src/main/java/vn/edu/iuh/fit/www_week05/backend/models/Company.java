@@ -42,4 +42,13 @@ public class Company {
     @OneToMany(mappedBy = "company")
 //    @JoinColumn(name = "jobs")
     private List<Job> jobs;
+
+    public Company(String name, Address address, String webURL, String phone, String email, String about) {
+        this.name = name;
+        this.address = address;
+        this.webURL = webURL;
+        this.phone = phone;
+        this.email = email;
+        this.about = about;
+    }
 }

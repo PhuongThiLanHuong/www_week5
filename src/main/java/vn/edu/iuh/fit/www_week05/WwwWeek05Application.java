@@ -9,6 +9,7 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.context.annotation.Bean;
 import vn.edu.iuh.fit.www_week05.backend.models.Address;
 import vn.edu.iuh.fit.www_week05.backend.models.Candidate;
+import vn.edu.iuh.fit.www_week05.backend.models.Company;
 import vn.edu.iuh.fit.www_week05.backend.repositories.AddressRepository;
 import vn.edu.iuh.fit.www_week05.backend.repositories.CandidateRepository;
 
@@ -42,4 +43,5 @@ public class WwwWeek05Application {
 //            }
 //        };
    // }
+
 	}
