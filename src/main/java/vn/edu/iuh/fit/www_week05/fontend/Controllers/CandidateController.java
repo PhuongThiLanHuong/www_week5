@@ -2,6 +2,7 @@ package vn.edu.iuh.fit.www_week05.fontend.Controllers;
 
 
 import com.neovisionaries.i18n.CountryCode;
+import jakarta.servlet.http.HttpSession;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -29,7 +30,7 @@ public class CandidateController {
     @Autowired
     private CandidateRepository candidateRepository;
     @Autowired
-    private CandidateServices candidateServices;
+    private CandidateServices candidateService;
     @Autowired
     private AddressRepository addressRepository;
     @Autowired
@@ -42,15 +43,13 @@ public class CandidateController {
     }
 
     @GetMapping("/list-paging")
-    public String showCandidateListPaging(Model model,
-                                          @RequestParam("page") Optional<Integer> page,
-                                          @RequestParam("size") Optional<Integer> size) {
+    public String showListCandidatePaging(Model model
+            , @RequestParam("page") Optional<Integer> page
+            , @RequestParam("size") Optional<Integer> size) {
+
         int currentPage = page.orElse(1);
         int pageSize = size.orElse(10);
-        /*Page<Candidate> candidatePage= candidateServices.findPaginated(
-                PageRequest.of(currentPage - 1, pageSize)
-        );*/
-        Page<Candidate> candidatePage = candidateServices.findAll(currentPage - 1,
+        Page<Candidate> candidatePage = candidateService.findAll(currentPage - 1,
                 pageSize, "id", "asc");
 
         model.addAttribute("candidatePage", candidatePage);
@@ -64,7 +63,6 @@ public class CandidateController {
         }
         return "candidates/list";
     }
-
     @GetMapping("/show-add-form")
     public ModelAndView add(Model model) {
         ModelAndView modelAndView = new ModelAndView();
@@ -92,7 +90,7 @@ public class CandidateController {
     public ModelAndView edit(@PathVariable("id") long id) {
         ModelAndView modelAndView = new ModelAndView();
         Optional<Candidate> opt = candidateRepository.findById(id);
-        if (opt.isPresent()) {
+        if(opt.isPresent()) {
             Candidate candidate = opt.get();
             modelAndView.addObject("candidate", candidate);
             modelAndView.addObject("address", candidate.getAddress());
@@ -101,17 +99,14 @@ public class CandidateController {
         }
         return modelAndView;
     }
-
     @PostMapping("/candidates/update/{id}")
     public String update(
             @ModelAttribute("candidate") Candidate candidate,
             @ModelAttribute("address") Address address) {
         addressRepository.save(address);
-//        candidate.setAddress(address);
         candidateRepository.save(candidate);
-        return "redirect:/candidates/update";
+        return "redirect:/list";
     }
-
     @GetMapping("/candidates/delete/{id}")
     public String delete(@PathVariable("id") long id) {
         Optional<Candidate> optionalCandidate = candidateRepository.findById(id);
