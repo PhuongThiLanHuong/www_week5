@@ -38,24 +38,7 @@ public class CompanyController {
         this.addressRepository = addressRepository;
     }
 
-    @GetMapping("/suggest-candidate")
-    public String home(@RequestParam("page") Optional<Integer> page, @RequestParam("size") Optional<Integer> size, @RequestParam("company-id") Optional<Long> companyId, Model model) {
-        int sizeI = size.orElse(10);
-        List<Company> companies = companyRepository.findAll();
 
-        if (companyId.isPresent()) {
-            PageRequest pageRequest = PageRequest.of(page.orElse(1) - 1, sizeI, Sort.by("can_id"));
-
-            Page<Candidate> candidates = candidateRepository.suggestCandidate(companyId.get(), pageRequest);
-
-            model.addAttribute("candidates", candidates);
-            model.addAttribute("companyId", companyId.get());
-            model.addAttribute("pages", IntStream.rangeClosed(1, candidates.getTotalPages()).boxed().collect(Collectors.toList()));
-        }
-        model.addAttribute("companies", companies);
-
-        return "companies/suggest-candidate";
-    }
     @GetMapping("/listCompany")
     public String showCandidateList(Model model) {
         model.addAttribute("companies",companyRepository.findAll());
